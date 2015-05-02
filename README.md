@@ -11,4 +11,4 @@ Skein is a family of cryptographic hash functions. Skein’s design combines spe
 Skein add-on is a node add-on that wraps Skein C implementation. Skein implementation is known for its speed. The objective of this project is to make Skein available for node.js packages without sacrificing performance. The wrapper will also include crypto functions leveraging high speed and security.
 
 # Reference
-[1](https://www.schneier.com/skein.html)
+[1 Skein website](https://www.schneier.com/skein.html)
