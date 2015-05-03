@@ -1,10 +1,11 @@
 {
   "name": "skein",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "node.js add-on for skein hash functions",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild"
   },
   "repository": {
     "type": "git",
@@ -22,5 +23,9 @@
   "bugs": {
     "url": "https://github.com/ecoruh/skein/issues"
   },
-  "homepage": "https://github.com/ecoruh/skein"
+  "homepage": "https://github.com/ecoruh/skein",
+  "gypfile": true,
+  "directories": {
+    "test": "test"
+  }
 }
