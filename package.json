@@ -1,6 +1,6 @@
 {
   "name": "skein",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "node.js add-on for skein hash functions",
   "main": "index.js",
   "scripts": {
@@ -22,8 +22,5 @@
   "bugs": {
     "url": "https://github.com/ecoruh/skein/issues"
   },
-  "homepage": "https://github.com/ecoruh/skein",
-  "directories": {
-    "test": "test"
-  }
+  "homepage": "https://github.com/ecoruh/skein"
 }
