@@ -19,7 +19,7 @@ npm install skein
 ## skein functions
 The following functions are currently available from the skein add-on.
 
-### calcHah
+### calcHash
 The method `calcHash` takes a string argument and returns a 512-bit (64-byte) hash value in a Buffer object. The buffer object is NOT stored internally.
 
 ```javascript
