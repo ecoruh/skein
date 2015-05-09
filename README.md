@@ -2,7 +2,7 @@
 node.js add-on for skein hash functions 
 
 ## Status
-This version of skein add-on is under development and not worth to install. There will be an MVP (Minimal Viable Product) soon which will be built for OS X and Windows. Linux and Raspbian support will follow. Stay tuned.
+This version of skein add-on is under development and incomplete. The functions currently implemented for OS X and Windows platforms are described below. There will be an MVP (Minimal Viable Product) soon which will be built for OS X and Windows. Linux and Raspbian support will follow. Stay tuned.
 
 ## What is Skein?
 Skein is a family of cryptographic hash functions. Skein’s design combines speed, security, simplicity, and a great deal of flexibility in a modular package that is easy to analyze  [1]
@@ -18,6 +18,15 @@ npm install skein
 
 ## skein functions
 The following functions are currently available from the skein add-on.
+
+### hash
+The method `echo` takes a string argument and returns a 512-bit (64-byte) hash value in a Buffer object produced from it.
+
+```javascript
+ var crypto = new skein.Crypto();
+ var hash = crypto.hash(“my top secret password”);
+ assert.equal(hash.length, 64);
+ ```
 
 ### echo
 The method `echo` takes a Buffer argument and returns a copy of it.

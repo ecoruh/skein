@@ -8,6 +8,7 @@
 ************************************************************************/
 
 #include <memory.h>
+#include <string.h>
 #include "skeincrypto.h"
 
 void sk_init(SKCipher* ctx, const unsigned char* key, size_t bitSize)
