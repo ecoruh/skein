@@ -9,7 +9,7 @@
             "src/skein_debug.c",
             "src/skein_block.c",
             "src/SHA3api_ref.c",
-            "src/skeincrypto.c"
+            "src/skeincrypto.cc"
          ]
       }
    ]

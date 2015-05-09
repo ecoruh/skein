@@ -23,8 +23,9 @@ private:
    explicit Crypto();
    ~Crypto();
    static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
-   static void Echo(const v8::FunctionCallbackInfo<v8::Value>& args);
    static v8::Persistent<v8::Function> constructor;
+   static void Echo(const v8::FunctionCallbackInfo<v8::Value>& args);
+   static void Hash(const v8::FunctionCallbackInfo<v8::Value>& args);
 
    SKCipher* ctx; 
 }; 
