@@ -20,7 +20,7 @@ npm install skein
 The following functions are currently available from the skein add-on.
 
 ### hash
-The method `echo` takes a string argument and returns a 512-bit (64-byte) hash value in a Buffer object produced from it.
+The method `hash` takes a string argument and returns a 512-bit (64-byte) hash value in a Buffer object produced from it.
 
 ```javascript
  var crypto = new skein.Crypto();
