@@ -33,6 +33,7 @@ assert.equal(hash.length, 64);
 The method `setHash` takes a Buffer argument with length 64 and sets the hash value on the `Crypto` object.
 
 ```javascript
+var skein = require('skein');
 var crypto = new skein.Crypto();
 var hash = crypto.calcHash("stritcly boring password");
 assert.equal(hash.length, 64);
@@ -45,6 +46,7 @@ assert.ok(actual.compare(hash) === 0);
 The method `getHash` returns the current hash value of the `Crypto` object as a 64 byte Buffer object. If the object's hash value was not set previously with a `setHash` call, this function throws an exception. 
 
 ```javascript
+var skein = require('skein');
 var crypto = new skein.Crypto();
 var hash = crypto.calcHash("jolly good fellow");
 assert.equal(hash.length, 64);
