@@ -19,19 +19,45 @@ npm install skein
 ## skein functions
 The following functions are currently available from the skein add-on.
 
-### hash
-The method `hash` takes a string argument and returns a 512-bit (64-byte) hash value in a Buffer object produced from it.
+### calcHah
+The method `calcHash` takes a string argument and returns a 512-bit (64-byte) hash value in a Buffer object. The buffer object is NOT stored internally.
 
 ```javascript
- var crypto = new skein.Crypto();
- var hash = crypto.hash(“my top secret password”);
- assert.equal(hash.length, 64);
- ```
+var skein = require('skein');
+var crypto = new skein.Crypto();
+var hash = crypto.calcHash(“my top secret password”);
+assert.equal(hash.length, 64);
+```
+
+### setHash
+The method `setHash` takes a Buffer argument with length 64 and sets the hash value on the `Crypto` object.
+
+```javascript
+var crypto = new skein.Crypto();
+var hash = crypto.calcHash("stritcly boring password");
+assert.equal(hash.length, 64);
+crypto.setHash(hash);
+var actual = crypto.getHash();
+assert.ok(actual.compare(hash) === 0); 
+```
+
+### getHash
+The method `getHash` returns the current hash value of the `Crypto` object as a 64 byte Buffer object. If the object's hash value was not set previously with a `setHash` call, this function throws an exception. 
+
+```javascript
+var crypto = new skein.Crypto();
+var hash = crypto.calcHash("jolly good fellow");
+assert.equal(hash.length, 64);
+crypto.setHash(hash);
+var actual = crypto.getHash();
+assert.ok(actual.compare(hash) === 0); 
+```
 
 ### echo
 The method `echo` takes a Buffer argument and returns a copy of it.
 
 ```javascript
+var skein = require('skein');
 var obj = new skein.Crypto();
 var expected = new Buffer([1, 2, 3]);
 var actual = obj.echo(expected);
