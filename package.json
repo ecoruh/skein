@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/ecoruh/skein/issues"
   },
-  "homepage": "https://github.com/ecoruh/skein"
+  "homepage": "https://github.com/ecoruh/skein",
+  "directories": {
+    "test": "test"
+  }
 }
