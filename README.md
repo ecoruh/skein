@@ -37,11 +37,13 @@ The method `setHash` takes a Buffer argument with length 64 and sets the hash va
 ```javascript
 var skein = require('skein');
 var crypto = new skein.Crypto();
-var hash = crypto.calcHash("stritcly boring password");
-assert.equal(hash.length, 64);
-crypto.setHash(hash);
-var actual = crypto.getHash();
-assert.ok(actual.compare(hash) === 0); 
+crypto.calcHash("stritcly boring password", function(err, data) {
+   assert.equal(data.length, 64);
+   crypto.setHash(data);
+   crypto.getHash( function (err, hash) {
+      assert.ok(hash.compare(data) === 0);
+   });
+});
 ```
 
 ### getHash
