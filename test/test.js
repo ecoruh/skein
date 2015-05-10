@@ -7,22 +7,26 @@ var skein = require('../build/Release/skein');
 
 describe('Echo test', function () {
    describe('echo test', function () {
-      it('should echo buffer object', function () {
+      it('should echo buffer object', function (done) {
          var crypto = new skein.Crypto();
          var expected = new Buffer([1, 2, 3]);
-         var actual = crypto.echo(expected);
-         assert.ok(actual.compare(expected) === 0);
+         crypto.echo(expected, function (data) {
+            assert.ok(data.compare(expected) === 0);
+            done();
+         });
       });
    });
 });
 
 describe('CalcHash test', function () {
    describe('calcHash test', function () {
-
-      it('should calculate a hash', function () {
+      it('should calculate a hash', function (done) {
          var crypto = new skein.Crypto();
-         var hash = crypto.calcHash("my top secret password");
-         assert.equal(hash.length, 64);
+         crypto.calcHash("my top secret password", function (err, data) {
+            assert.equal(err, null);
+            assert.equal(data.length, 64);
+            done();
+         });
       });
 
       it('should throw wrong number of arguments exception', function () {
@@ -30,16 +34,16 @@ describe('CalcHash test', function () {
          try {
             crypto.calcHash();
          } catch (e) {
-            assert.equal(e.message, 'There must be one String argument for password');
+            assert.equal(e.message, 'There must be two arguments');
          }
       });
 
       it('should throw argument type exception', function () {
          var crypto = new skein.Crypto();
          try {
-            crypto.calcHash(123);
+            crypto.calcHash(123, "foo");
          } catch (e) {
-            assert.equal(e.message, 'Argument type should be a String');
+            assert.equal(e.message, 'Expected a string and a function');
          }
       });
    });
@@ -48,13 +52,16 @@ describe('CalcHash test', function () {
 describe('SetHash/GetHash test', function () {
    describe('setHash/getHash test', function () {
 
-      it('should validate hash via set/get methods', function () {
+      it('should validate hash via set/get methods', function (done) {
          var crypto = new skein.Crypto();
-         var hash = crypto.calcHash("stritcly boring password");
-         assert.equal(hash.length, 64);
-         crypto.setHash(hash);
-         var actual = crypto.getHash();
-         assert.ok(actual.compare(hash) === 0);
+         crypto.calcHash("stritcly boring password", function(err, data) {
+            assert.equal(data.length, 64);
+            crypto.setHash(data);
+            crypto.getHash( function (err, hash) {
+               assert.ok(hash.compare(data) === 0);
+               done();               
+            });
+         });
       });
 
       it('should throw missing argument exception for setHash', function () {
@@ -80,7 +87,7 @@ describe('SetHash/GetHash test', function () {
          try {
             crypto.getHash('a');
          } catch (e) {
-            assert.equal(e.message, "There must be no arguments");
+            assert.equal(e.message, "There must be one function argument");
          }
       });
 
@@ -89,7 +96,7 @@ describe('SetHash/GetHash test', function () {
          try {
             crypto.getHash();
          } catch (e) {
-            assert.equal(e.message, "The hash must be set first. Use setHash");
+            assert.equal(e.message, "There must be one function argument");
          }
       });
 

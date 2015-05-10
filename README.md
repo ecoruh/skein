@@ -25,8 +25,10 @@ The method `calcHash` takes a string argument and returns a 512-bit (64-byte) ha
 ```javascript
 var skein = require('skein');
 var crypto = new skein.Crypto();
-var hash = crypto.calcHash(“my top secret password”);
-assert.equal(hash.length, 64);
+crypto.calcHash("my top secret password", function (err, data) {
+   assert.equal(err, null);
+   assert.equal(data.length, 64);
+});
 ```
 
 ### setHash
@@ -43,27 +45,31 @@ assert.ok(actual.compare(hash) === 0);
 ```
 
 ### getHash
-The method `getHash` returns the current hash value of the `Crypto` object as a 64 byte Buffer object. If the object's hash value was not set previously with a `setHash` call, this function throws an exception. 
+The method `getHash` returns the current hash value of the `Crypto` object as a 64 byte Buffer object. If the object's hash value was not set previously with a `setHash` call, this function returns an error. 
 
 ```javascript
 var skein = require('skein');
 var crypto = new skein.Crypto();
-var hash = crypto.calcHash("jolly good fellow");
-assert.equal(hash.length, 64);
-crypto.setHash(hash);
-var actual = crypto.getHash();
-assert.ok(actual.compare(hash) === 0); 
+crypto.calcHash("stritcly boring password", function(err, data) {
+   assert.equal(data.length, 64);
+   crypto.setHash(data);
+   crypto.getHash( function (err, hash) {
+      assert.ok(hash.compare(data) === 0);
+   });
+});
 ```
 
 ### echo
-The method `echo` takes a Buffer argument and returns a copy of it.
+The method `echo` takes a Buffer argument and returns a copy of it in a callback.
 
 ```javascript
 var skein = require('skein');
-var obj = new skein.Crypto();
+var crypto = new skein.Crypto();
 var expected = new Buffer([1, 2, 3]);
-var actual = obj.echo(expected);
-assert.ok(actual.compare(expected) === 0);
+crypto.echo(expected, function (data) {
+   assert.ok(data.compare(expected) === 0);
+   done();
+});
 ```
 
 ## Acknowledgement

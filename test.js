@@ -1,6 +1,13 @@
+/*jslint node: true */
+"use strict";
+
 var assert = require('assert');
-var skein = require('skein');
+var skein = require('./build/Release/skein');
 
 var buf = new Buffer([1, 2, 3]);
 var obj = new skein.Crypto();
-console.log(obj.echo(buf));
+
+obj.echo(buf, function (data) {
+   console.log(data);
+});
+
