@@ -52,7 +52,7 @@ The method `getHash` returns the current hash value of the `Crypto` object as a 
 ```javascript
 var skein = require('skein');
 var crypto = new skein.Crypto();
-crypto.calcHash("stritcly boring password", function(err, data) {
+crypto.calcHash("another boring password", function(err, data) {
    assert.equal(data.length, 64);
    crypto.setHash(data);
    crypto.getHash( function (err, hash) {
