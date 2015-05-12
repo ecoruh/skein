@@ -1,6 +1,6 @@
 {
   "name": "skein",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "node.js add-on for skein hash functions",
   "main": "index.js",
   "scripts": {

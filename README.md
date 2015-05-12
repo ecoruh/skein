@@ -8,7 +8,7 @@ Skein is a family of cryptographic hash functions. Skein’s design combines spe
 Skein add-on wraps original Skein C implementation. The add-on makes Skein available for node.js packages without sacrificing its speed. The wrapper includes a 512-bit hash function and a pair of 512-bit symmetric encryption functions.
 
 ## Status
-The add-on is currently available for OS X and Windows platforms. Linux and Raspbian builts are in progress and they will be available soon. Please stay tuned and check out this page for further news.
+The add-on is currently available for Linux, OS X and Windows platforms. Raspbian build is in progress and it will be available soon. Please stay tuned and check out this page for further news.
 
 ## How do I install?
 
