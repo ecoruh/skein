@@ -18,8 +18,69 @@ describe('Echo test', function () {
    });
 });
 
+describe('Encrypt test', function () {
+   describe('encrypt test', function () {
+
+      it('should encrypt a string', function (done) {
+         var crypto = new skein.Crypto();
+         crypto.calcHash("my top secret password", function (err, hash) {
+            assert.equal(err, null);
+            assert.equal(hash.length, 64);
+            crypto.encrypt(hash, "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν", function (err, data) {
+               assert.equal(err, null);
+               assert.equal(data.length, 76);
+               done();
+            });
+         });
+      });
+
+      it('should throw wrong number of arguments exception', function () {
+         var crypto = new skein.Crypto();
+         try {
+            crypto.encrypt();
+         } catch (e) {
+            assert.equal(e.message, 'There must be 3 arguments');
+         }
+      });
+
+      it('should throw argument type exception', function () {
+         var crypto = new skein.Crypto();
+         try {
+            crypto.encrypt(123, "foo", 123);
+         } catch (e) {
+            assert.equal(e.message, 'Expected a buffer, a string and a function');
+         }
+      });
+
+
+   });
+});
+
+describe('Decrypt test', function () {
+   describe('decrypt test', function () {
+
+      it('should decrypt a string', function (done) {
+         var crypto = new skein.Crypto();
+         crypto.calcHash("my top secret password", function (err, hash) {
+            assert.equal(err, null);
+            assert.equal(hash.length, 64);
+            var text = "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν";
+            crypto.encrypt(hash, text, function (err, cyphered) {
+               assert.equal(err, null);
+               crypto.decrypt(hash, cyphered, function (err, decyphered) {
+                  assert.equal(err, null);
+                  assert.equal(decyphered, text);
+                  done();
+               });
+            });
+         });
+      });
+   });
+});
+
 describe('CalcHash test', function () {
    describe('calcHash test', function () {
+
       it('should calculate a hash', function (done) {
          var crypto = new skein.Crypto();
          crypto.calcHash("my top secret password", function (err, data) {
@@ -49,56 +110,3 @@ describe('CalcHash test', function () {
    });
 });
 
-describe('SetHash/GetHash test', function () {
-   describe('setHash/getHash test', function () {
-
-      it('should validate hash via set/get methods', function (done) {
-         var crypto = new skein.Crypto();
-         crypto.calcHash("stritcly boring password", function(err, data) {
-            assert.equal(data.length, 64);
-            crypto.setHash(data);
-            crypto.getHash( function (err, hash) {
-               assert.ok(hash.compare(data) === 0);
-               done();               
-            });
-         });
-      });
-
-      it('should throw missing argument exception for setHash', function () {
-         var crypto = new skein.Crypto();
-         try {
-            crypto.setHash();
-         } catch (e) {
-            assert.equal(e.message, 'There must be one Buffer argument for hash');
-         }
-      });
-
-      it('should throw missing argument exception for setHash', function () {
-         var crypto = new skein.Crypto();
-         try {
-            crypto.setHash(new Buffer([2, 4, 6]));
-         } catch (e) {
-            assert.equal(e.message, "The Buffer argument's length must be 64 bytes");
-         }
-      });
-
-      it('should throw missing argument exception for getHash', function () {
-         var crypto = new skein.Crypto();
-         try {
-            crypto.getHash('a');
-         } catch (e) {
-            assert.equal(e.message, "There must be one function argument");
-         }
-      });
-
-      it('should throw hash must be set exception for getHash', function () {
-         var crypto = new skein.Crypto();
-         try {
-            crypto.getHash();
-         } catch (e) {
-            assert.equal(e.message, "There must be one function argument");
-         }
-      });
-
-   });
-});

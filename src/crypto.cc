@@ -24,8 +24,6 @@ void Crypto::Init (Handle<Object> exports) {
    // Prototype
    NODE_SET_PROTOTYPE_METHOD(tpl, "echo", Echo);
    NODE_SET_PROTOTYPE_METHOD(tpl, "calcHash", CalcHash);
-   NODE_SET_PROTOTYPE_METHOD(tpl, "setHash", SetHash);
-   NODE_SET_PROTOTYPE_METHOD(tpl, "getHash", GetHash);
    NODE_SET_PROTOTYPE_METHOD(tpl, "encrypt", Encrypt);
    NODE_SET_PROTOTYPE_METHOD(tpl, "decrypt", Decrypt);
 
@@ -51,8 +49,8 @@ void Crypto::New (const FunctionCallbackInfo<Value>& args) {
   }
 }
 
-static std::string getString (v8::Local<v8::String> str) {
-  char* buf = new char[str->Length() + 1];
+static std::string getString (Local<String> str) {
+  char* buf = new char[str->Utf8Length() + 1];
   str->WriteUtf8(buf);
   std::string value = reinterpret_cast<char*>(buf);
   delete[] buf;
@@ -60,67 +58,116 @@ static std::string getString (v8::Local<v8::String> str) {
 }
 
 void Crypto::Encrypt (const FunctionCallbackInfo<Value>& args) {
-
-}
-
-void Crypto::Decrypt (const FunctionCallbackInfo<Value>& args) {
-
-}
-
-void Crypto::SetHash (const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = Isolate::GetCurrent();
   HandleScope scope(isolate);
 
-  if (args.Length() < 1 || !args[0]->IsObject()) {
+  if (args.Length() < 3) {
     isolate->ThrowException(Exception::Error(
-        String::NewFromUtf8(isolate, "There must be one Buffer argument for hash")));
+      String::NewFromUtf8(isolate, "There must be 3 arguments")));
     return;
   }
 
-  Local<Object> obj = args[0]->ToObject();
-  char* data  = Buffer::Data(obj);
-  size_t length = Buffer::Length(obj);
-
-  if (length != 64) {
+  if (!args[0]->IsObject() || !args[1]->IsString() || !args[2]->IsFunction()) {
     isolate->ThrowException(Exception::Error(
-        String::NewFromUtf8(isolate, "The Buffer argument's length must be 64 bytes")));
+      String::NewFromUtf8(isolate, "Expected a buffer, a string and a function")));
     return;
   }
 
-  Crypto* crp = ObjectWrap::Unwrap<Crypto>(args.Holder());
-  delete crp->ctx;
-  crp->ctx = new SKCipher();
-
-  sk_init(crp->ctx, (const unsigned char*)data, SKEIN_BITS);
-
-  return;
-}
-
-void Crypto::GetHash (const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
-
-  if (args.Length() < 1 || !args[0]->IsFunction()) {
-    isolate->ThrowException(Exception::Error(
-      String::NewFromUtf8(isolate, "There must be one function argument")));
-    return;
-  }
-  
+  Local<Object> hashObj = args[0]->ToObject();
+  Local<String> clearTextStr = args[1]->ToString();
   const unsigned argc = 2;
-  Local<Function> cb = Local<Function>::Cast(args[0]);
+  Local<Function> cb = Local<Function>::Cast(args[2]);
 
-  Crypto* crp = ObjectWrap::Unwrap<Crypto>(args.Holder());
-  if (crp->ctx == NULL) {
-    Local<Value> argv[argc] = { 
-      Exception::Error(String::NewFromUtf8(isolate, "The hash must be set first. Use setHash")), 
-      Undefined(isolate) };
-      cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+  if (!clearTextStr->Length()) { 
+    Local<Value> argv[argc] = {   
+      Exception::Error(String::NewFromUtf8(isolate, "The 2nd argument clear text must have non-zero length")), 
+      Undefined(isolate) 
+    };
+    cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
     return;
   }
+
+  char* hash  = Buffer::Data(hashObj);
+  size_t length = Buffer::Length(hashObj);
+
+  if (length != SKEIN_BYTES) {
+    Local<Value> argv[argc] = {   
+      Exception::Error(String::NewFromUtf8(isolate, "The hash buffer argument's length must be 64 bytes")), 
+      Undefined(isolate) 
+    };
+    cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+    return;
+  }
+
+  SKCipher cipher;
+  sk_init(&cipher, (unsigned char*)hash, SKEIN_BITS);
+
+  std::string clearText = getString(clearTextStr);
+  size_t size = clearText.length() + 1;
+  unsigned char cipherText[size];
+
+  sk_encrypt(&cipher, (char*)clearText.c_str(), size, (char*)cipherText, size);
 
   Local<Value> argv[argc] = { 
     Undefined(isolate), 
-    Buffer::New(isolate, (char*)crp->ctx->key, SKEIN_BYTES) };
+    Buffer::New(isolate, (char*)cipherText, size) };
+  cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+}
+
+void Crypto::Decrypt (const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = Isolate::GetCurrent();
+  HandleScope scope(isolate);
+
+  if (args.Length() < 3) {
+    isolate->ThrowException(Exception::Error(
+      String::NewFromUtf8(isolate, "There must be 3 arguments")));
+    return;
+  }
+
+  if (!args[0]->IsObject() || !args[1]->IsObject() || !args[2]->IsFunction()) {
+    isolate->ThrowException(Exception::Error(
+      String::NewFromUtf8(isolate, "Expected a buffer, a string and a function")));
+    return;
+  }
+
+  Local<Object> hashObj = args[0]->ToObject();
+  Local<Object> cipherObj = args[1]->ToObject();
+  char* cipherData  = Buffer::Data(cipherObj);
+  size_t cipherSize = Buffer::Length(cipherObj);
+  const unsigned argc = 2;
+  Local<Function> cb = Local<Function>::Cast(args[2]);
+
+  if (!cipherSize) { 
+    Local<Value> argv[argc] = {   
+      Exception::Error(String::NewFromUtf8(isolate, "The 2nd argument cipher text must have non-zero length")), 
+      Undefined(isolate) 
+    };
+    cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+    return;
+  }
+
+  char* hash  = Buffer::Data(hashObj);
+  size_t length = Buffer::Length(hashObj);
+
+  if (length != SKEIN_BYTES) {
+    Local<Value> argv[argc] = {   
+      Exception::Error(String::NewFromUtf8(isolate, "The hash buffer argument's length must be 64 bytes")), 
+      Undefined(isolate) 
+    };
+    cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+    return;
+  }
+
+  SKCipher cipher;
+  sk_init(&cipher, (unsigned char*)hash, SKEIN_BITS);
+
+  char clearText[cipherSize];
+
+  sk_decrypt(&cipher, cipherData, cipherSize, clearText, cipherSize);
+
+  Local<Value> argv[argc] = { 
+    Undefined(isolate), 
+    String::NewFromUtf8(isolate, clearText) };
   cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
 
@@ -142,8 +189,7 @@ void Crypto::CalcHash (const FunctionCallbackInfo<Value>& args) {
 
   std::string password = getString(args[0]->ToString());
   unsigned char* data = sk_get_key(password.c_str(), SKEIN_BITS);
-  Local<Object> actualBuffer = Buffer::New(isolate, (char*)data, (size_t)SKEIN_BYTES);
-  
+    
   const unsigned argc = 2;
   Local<Value> argv[argc] = { Undefined(isolate), Buffer::New(isolate, (char*)data, (size_t)SKEIN_BYTES) };
   Local<Function> cb = Local<Function>::Cast(args[1]);

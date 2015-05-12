@@ -30,36 +30,43 @@ crypto.calcHash("my top secret password", function (err, data) {
    assert.equal(data.length, 64);
 });
 ```
-
-### setHash
-The method `setHash` takes a Buffer argument with length 64 and sets the hash value on the `Crypto` object.
-
-```javascript
-var skein = require('skein');
-var crypto = new skein.Crypto();
-crypto.calcHash("stritcly boring password", function(err, data) {
-   assert.equal(data.length, 64);
-   crypto.setHash(data);
-   crypto.getHash( function (err, hash) {
-      assert.ok(hash.compare(data) === 0);
-   });
-});
-```
-
-### getHash
-The method `getHash` returns the current hash value of the `Crypto` object as a 64 byte Buffer object. If the object's hash value was not set previously with a `setHash` call, this function returns an error. 
+### encrypt
+The method `encrypt` takes a 64-byte hash value argument to be used as encryption key, a string to encrypt, and a function object to return encrypted binary data in a buffer. Typically the hash value is calculated using `calcHash` function although it does not have to be.
 
 ```javascript
 var skein = require('skein');
 var crypto = new skein.Crypto();
-crypto.calcHash("another boring password", function(err, data) {
-   assert.equal(data.length, 64);
-   crypto.setHash(data);
-   crypto.getHash( function (err, hash) {
-      assert.ok(hash.compare(data) === 0);
+crypto.calcHash("my top secret password", function (err, hash) {
+   assert.equal(err, null);
+   assert.equal(hash.length, 64);
+   crypto.encrypt(hash, "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν", function (err, data) {
+      assert.equal(err, null);
+      assert.equal(data.length, 76);
+      done();
    });
 });
 ```
+
+### decrypt
+The method `decrypt` takes a 64-byte hash value argument to be used as encryption key, a binary buffer to decrypt, and a function object to return decrypted data in a buffer. Typically the hash value is calculated using `calcHash` function although it does not have to be. 
+
+```javascript
+var skein = require('skein');
+var crypto = new skein.Crypto();
+crypto.calcHash("my top secret password", function (err, hash) {
+   assert.equal(err, null);
+   assert.equal(hash.length, 64);
+   var text = "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν";
+   crypto.encrypt(hash, text, function (err, ciphered) {
+      assert.equal(err, null);
+      crypto.decrypt(hash, ciphered, function (err, decyphered) {
+         assert.equal(err, null);
+         assert.equal(decyphered, text);
+         done();
+      });
+   });
+});
+ ```
 
 ### echo
 The method `echo` takes a Buffer argument and returns a copy of it in a callback.
