@@ -68,19 +68,6 @@ crypto.calcHash("my top secret password", function (err, hash) {
 });
  ```
 
-### echo
-The method `echo` takes a Buffer argument and returns a copy of it in a callback.
-
-```javascript
-var skein = require('skein');
-var crypto = new skein.Crypto();
-var expected = new Buffer([1, 2, 3]);
-crypto.echo(expected, function (data) {
-   assert.ok(data.compare(expected) === 0);
-   done();
-});
-```
-
 ## Acknowledgement
 Skein was developed by Niels Ferguson, Stefan Lucks, Bruce Schneier, Doug Whiting, Mihir Bellare, Tadayoshi Kohno, Jon Callas, Jesse Walker. 
 
