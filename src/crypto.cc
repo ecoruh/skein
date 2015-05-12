@@ -1,4 +1,4 @@
-
+    
 #include "crypto.h"
 #include <string>
 
@@ -60,7 +60,7 @@ static std::string getString (Local<String> str) {
 void Crypto::Encrypt (const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = Isolate::GetCurrent();
   HandleScope scope(isolate);
-
+  
   if (args.Length() < 3) {
     isolate->ThrowException(Exception::Error(
       String::NewFromUtf8(isolate, "There must be 3 arguments")));
@@ -104,13 +104,14 @@ void Crypto::Encrypt (const FunctionCallbackInfo<Value>& args) {
 
   std::string clearText = getString(clearTextStr);
   size_t size = clearText.length() + 1;
-  unsigned char cipherText[size];
+  unsigned char* cipherText = new unsigned char[size];
 
   sk_encrypt(&cipher, (char*)clearText.c_str(), size, (char*)cipherText, size);
 
   Local<Value> argv[argc] = { 
     Undefined(isolate), 
     Buffer::New(isolate, (char*)cipherText, size) };
+  delete [] cipherText;
   cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
 
@@ -161,14 +162,16 @@ void Crypto::Decrypt (const FunctionCallbackInfo<Value>& args) {
   SKCipher cipher;
   sk_init(&cipher, (unsigned char*)hash, SKEIN_BITS);
 
-  char clearText[cipherSize];
+  char* clearText = new char[cipherSize];
 
   sk_decrypt(&cipher, cipherData, cipherSize, clearText, cipherSize);
 
   Local<Value> argv[argc] = { 
     Undefined(isolate), 
     String::NewFromUtf8(isolate, clearText) };
+  delete [] clearText;  
   cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+
 }
 
 void Crypto::CalcHash (const FunctionCallbackInfo<Value>& args) {
