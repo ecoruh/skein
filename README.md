@@ -1,14 +1,14 @@
 # skein
-node.js add-on for skein hash functions 
-
-## Status
-This version of skein add-on is under development and incomplete. The functions currently implemented for OS X and Windows platforms are described below. There will be an MVP (Minimal Viable Product) soon which will be built for OS X and Windows. Linux and Raspbian support will follow. Stay tuned.
+node.js encryption add-on using Skein hash functions 
 
 ## What is Skein?
-Skein is a family of cryptographic hash functions. Skein’s design combines speed, security, simplicity, and a great deal of flexibility in a modular package that is easy to analyze  [1]
+Skein is a family of cryptographic hash functions. Skein’s design combines speed, security, simplicity, and a great deal of flexibility in a modular package that is easy to analyze.  [1]
 
 ## What is skein add-on?
-Skein add-on is a node add-on that wraps Skein C implementation. Skein implementation is known for its speed. The objective of this project is to make Skein available for node.js packages without sacrificing performance. The wrapper will also include crypto functions leveraging high speed and security.
+Skein add-on wraps original Skein C implementation. The add-on makes Skein available for node.js packages without sacrificing its speed. The wrapper includes a 512-bit hash function and a pair of 512-bit symmetric encryption functions.
+
+## Status
+The add-on is currently available for OS X and Windows platforms. Linux and Raspbian builts are in progress and they will be available soon. Please stay tuned and check out this page for further news.
 
 ## How do I install?
 
@@ -17,21 +17,10 @@ npm install skein
 ```
 
 ## skein functions
-The following functions are currently available from the skein add-on.
+The following functions are currently available from the skein add-on. These functions are asynchronous in nature and conforms to node.js 'error-first' callback convention. Argument errors can cause exceptions to be thrown.
 
 ### calcHash
-The method `calcHash` takes a string argument and returns a 512-bit (64-byte) hash value in a Buffer object. The buffer object is NOT stored internally.
-
-```javascript
-var skein = require('skein');
-var crypto = new skein.Crypto();
-crypto.calcHash("my top secret password", function (err, data) {
-   assert.equal(err, null);
-   assert.equal(data.length, 64);
-});
-```
-### encrypt
-The method `encrypt` takes a 64-byte hash value argument to be used as encryption key, a string to encrypt, and a function object to return encrypted binary data in a buffer. Typically the hash value is calculated using `calcHash` function although it does not have to be.
+The method `calcHash` takes a string argument and returns a 512-bit (64-byte) hash value in a `Buffer` object. The `Buffer` object is NOT stored internally. The `Buffer` object can be used as a key in the `encrypt` and `decrypt` functions.
 
 ```javascript
 var skein = require('skein');
@@ -39,16 +28,27 @@ var crypto = new skein.Crypto();
 crypto.calcHash("my top secret password", function (err, hash) {
    assert.equal(err, null);
    assert.equal(hash.length, 64);
-   crypto.encrypt(hash, "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν", function (err, data) {
+});
+```
+### encrypt
+The method `encrypt` takes a 64-byte hash value as a key, a `String` object to encrypt, and a function object to return encrypted binary data in a `Buffer` object. Typically the hash value is calculated using the `calcHash` function although it does not have to be.
+
+```javascript
+var skein = require('skein');
+var crypto = new skein.Crypto();
+crypto.calcHash("my top secret password", function (err, hash) {
+   assert.equal(err, null);
+   assert.equal(hash.length, 64);
+   crypto.encrypt(hash, "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν", function (err, encrypted) {
       assert.equal(err, null);
-      assert.equal(data.length, 76);
+      assert.equal(encrypted.length, 76);
       done();
    });
 });
 ```
 
 ### decrypt
-The method `decrypt` takes a 64-byte hash value argument to be used as encryption key, a binary buffer to decrypt, and a function object to return decrypted data in a buffer. Typically the hash value is calculated using `calcHash` function although it does not have to be. 
+The method `decrypt` takes a 64-byte hash value as a key, a binary `Buffer` object to decrypt, and a function object to return decrypted data in a `String` object. Typically the hash value is calculated using the `calcHash` function although it does not have to be. 
 
 ```javascript
 var skein = require('skein');
@@ -57,11 +57,11 @@ crypto.calcHash("my top secret password", function (err, hash) {
    assert.equal(err, null);
    assert.equal(hash.length, 64);
    var text = "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν";
-   crypto.encrypt(hash, text, function (err, ciphered) {
+   crypto.encrypt(hash, text, function (err, encrypted) {
       assert.equal(err, null);
-      crypto.decrypt(hash, ciphered, function (err, decyphered) {
+      crypto.decrypt(hash, encrypted, function (err, decrypted) {
          assert.equal(err, null);
-         assert.equal(decyphered, text);
+         assert.equal(decrypted, text);
          done();
       });
    });
