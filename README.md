@@ -39,7 +39,8 @@ var crypto = new skein.Crypto();
 crypto.calcHash("my top secret password", function (err, hash) {
    assert.equal(err, null);
    assert.equal(hash.length, 64);
-   crypto.encrypt(hash, "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν", function (err, encrypted) {
+   var text = "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν";
+   crypto.encrypt(hash, text, function (err, encrypted) {
       assert.equal(err, null);
       assert.equal(encrypted.length, 76);
       done();
