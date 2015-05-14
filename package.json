@@ -1,7 +1,7 @@
 {
   "name": "skein",
-  "version": "1.0.14",
-  "description": "Compact small and fast 512-bit encryption add-on",
+  "version": "1.0.15",
+  "description": "Compact and fast 512-bit encryption add-on",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
