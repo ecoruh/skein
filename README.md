@@ -1,5 +1,5 @@
 # skein
-node.js encryption add-on using Skein hash functions 
+Compact small and fast 512-bit encryption add-on for node.js using Skein hash functions. 
 
 ## What is Skein?
 Skein is a family of cryptographic hash functions. Skein’s design combines speed, security, simplicity, and a great deal of flexibility in a modular package that is easy to analyze.  [1]
