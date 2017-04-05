@@ -1,3 +1,2 @@
 # do not checkin build stuff
 build/
-binding.gyp.txt

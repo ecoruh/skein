@@ -1,6 +1,6 @@
 {
   "name": "skein",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Compact and fast 512-bit encryption add-on",
   "main": "index.js",
   "scripts": {
