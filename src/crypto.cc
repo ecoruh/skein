@@ -110,7 +110,7 @@ void Crypto::Encrypt (const FunctionCallbackInfo<Value>& args) {
 
   Local<Value> argv[argc] = { 
     Undefined(isolate), 
-    Buffer::New(isolate, (char*)cipherText, size) };
+    ArrayBuffer::New(isolate, (char*)cipherText, size) };
   delete [] cipherText;
   cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
@@ -194,7 +194,7 @@ void Crypto::CalcHash (const FunctionCallbackInfo<Value>& args) {
   unsigned char* data = sk_get_key(password.c_str(), SKEIN_BITS);
     
   const unsigned argc = 2;
-  Local<Value> argv[argc] = { Undefined(isolate), Buffer::New(isolate, (char*)data, (size_t)SKEIN_BYTES) };
+  Local<Value> argv[argc] = { Undefined(isolate), ArrayBuffer::New(isolate, (char*)data, (size_t)SKEIN_BYTES) };
   Local<Function> cb = Local<Function>::Cast(args[1]);
   cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
@@ -209,7 +209,7 @@ void Crypto::Echo (const FunctionCallbackInfo<Value>& args) {
 
    Local<Function> cb = Local<Function>::Cast(args[1]);
    const unsigned argc = 1;
-   Local<Value> argv[argc] = { Buffer::New(isolate, data, length) };
+   Local<Value> argv[argc] = { ArrayBuffer::New(isolate, data, length) };
    cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
 
