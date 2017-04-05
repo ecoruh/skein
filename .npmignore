@@ -2,4 +2,4 @@
 build/
 .gitignore
 .npmignore
-binding.gyp
+binding.gyp.txt
